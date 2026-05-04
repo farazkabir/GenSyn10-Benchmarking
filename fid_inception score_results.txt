@@ -1,0 +1,10 @@
+FID / Inception Score Results
+============================
+inception_score_mean: 8.768588696633243
+inception_score_std: 0.10644443757948319
+frechet_inception_distance: 35.1746997717857
+kernel_inception_distance_mean: 0.018253118991851808
+kernel_inception_distance_std: 0.0010219650625222076
+precision: 0.24444591999053955
+recall: 0.26260000467300415
+f_score: 0.25319797126624183
