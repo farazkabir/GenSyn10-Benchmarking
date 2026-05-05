@@ -1,6 +1,41 @@
-# Synth10: A Synthetic CIFAR-10 Dataset from Vision-Language Models
+# GenSyn10: A Synthetic CIFAR-10 Dataset from Vision-Language Models
 
 A complete pipeline for generating, evaluating, and benchmarking a **synthetic image dataset** aligned with [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) using state-of-the-art text-to-image models. The project spans prompt engineering, multi-model image synthesis, distributional quality metrics, 17-architecture classification benchmarks, and real-vs-synthetic detection.
+
+---
+
+## Important Notes (Please Read First)
+
+### Dataset was previously named "Synth10"
+
+This dataset was originally named **Synth10**, and its real-vs-synthetic counterpart was named **SynthCIFAR**. They have since been renamed to **GenSyn10** and **GenSynCIFAR10**, respectively.
+
+The notebooks (`.ipynb` files) and their file names have **not** been renamed and still contain the old identifiers throughout their code, variables, paths, and filenames. Examples:
+
+- `synth10_fid_inception_metrics_eval.ipynb`
+- `SynthCIFAR_binary_classification_with_results (final).ipynb`
+- `cifar10_benchmark_eval_with_synth10_four_stage_with_results (final).ipynb`
+- `sdxl_dataset_synth10_eval.ipynb`
+- Path/variable references such as `synth10/train` and `SYNTH_ROOT`
+
+When reading the notebooks, treat every `synth10` / `Synth10` reference as **GenSyn10**, and every `SynthCIFAR` reference as **GenSynCIFAR10**.
+
+### Image generation notebooks generate 1000 images per run
+
+Each `Image_Generation_*.ipynb` notebook (SDXL, FLUX.2, Qwen-Image, HunyuanImage-3) is configured to generate **1000 images per run** — this is set by `samples_per_class=1000` inside the notebook's `GenConfig`.
+
+To build the full **60,000-image GenSyn10 dataset** (6,000 images per class across the four backends and prompt batches), the image generation notebooks must be **re-run multiple times** with different prompt slices and seeds, or `samples_per_class` must be increased manually.
+
+### Many experimental notebooks expect the dataset to already be in the environment
+
+Most of the experimental / benchmarking notebooks (Stages 3 through 7 below — FID/IS evaluation, four-stage cross-domain study, binary real-vs-synthetic classification, SDXL generalization study) **do not generate any image data themselves**. They assume the **GenSyn10 dataset** (and its supporting datasets — **GenSynCIFAR10**, **SdxlCIFAR**, **sdxl10**) are already present in the runtime environment.
+
+Before running any of these notebooks you must either:
+
+1. Run the image generation notebooks first (multiple times) to produce the data locally, **or**
+2. Download / unzip the pre-built dataset archives from Google Drive (the notebooks use `gdown` for this) into the expected working directory.
+
+If the dataset is not staged in the environment, the evaluation notebooks will fail at the data-loading cells.
 
 ---
 
@@ -13,8 +48,8 @@ A complete pipeline for generating, evaluating, and benchmarking a **synthetic i
   - [Stage 2: Image Generation](#stage-2-image-generation)
   - [Stage 3: Dataset Quality Evaluation (FID / IS / KID)](#stage-3-dataset-quality-evaluation)
   - [Stage 4: CIFAR-10 Model Initialization and Baseline Benchmark](#stage-4-cifar-10-model-initialization-and-baseline-benchmark)
-  - [Stage 5: Four-Stage Cross-Domain Evaluation (CIFAR-10 vs Synth10)](#stage-5-four-stage-cross-domain-evaluation)
-  - [Stage 6: Binary Real-vs-Synthetic Classification (SynthCIFAR)](#stage-6-binary-real-vs-synthetic-classification)
+  - [Stage 5: Four-Stage Cross-Domain Evaluation (CIFAR-10 vs GenSyn10)](#stage-5-four-stage-cross-domain-evaluation)
+  - [Stage 6: Binary Real-vs-Synthetic Classification (GenSynCIFAR10)](#stage-6-binary-real-vs-synthetic-classification)
   - [Stage 7: Single-Model (SDXL) Generalization Studies](#stage-7-single-model-sdxl-generalization-studies)
 - [Models Benchmarked](#models-benchmarked)
 - [Key Results](#key-results)
@@ -33,11 +68,11 @@ This repository provides:
 1. **Grammar-based prompt generation**: a combinatorial prompt builder producing diverse, photorealistic prompts across 10 CIFAR-10 classes with controllable difficulty tiers ("clean" and "hard").
 2. **Multi-model image synthesis**: Jupyter notebooks for four text-to-image backends that render 512x512 images from prompts, then downsample to 32x32 for CIFAR-style evaluation.
 3. **Distributional quality metrics**: FID, Inception Score, KID, Precision, and Recall computed against original CIFAR-10 using `torch-fidelity`.
-4. **17-architecture classification benchmarks**: a comprehensive evaluation of CNNs and vision transformers on both CIFAR-10 and the synthetic dataset (Synth10), including a four-stage domain-shift study.
-5. **Real-vs-synthetic binary detection**: all 17 models adapted for binary classification on the SynthCIFAR dataset (real vs. synthetic images), with a parallel **SD 3.5 Large-only** variant (SDCIFAR) that isolates a single generator.
-6. **Single-model generalization study**: Synth10 fine-tuned checkpoints evaluated against an SDXL-only test set to measure cross-generator transfer.
+4. **17-architecture classification benchmarks**: a comprehensive evaluation of CNNs and vision transformers on both CIFAR-10 and the synthetic dataset (GenSyn10), including a four-stage domain-shift study.
+5. **Real-vs-synthetic binary detection**: all 17 models adapted for binary classification on the GenSynCIFAR10 dataset (real vs. synthetic images), with a parallel **SD 3.5 Large-only** variant (SDCIFAR) that isolates a single generator.
+6. **Single-model generalization study**: GenSyn10 fine-tuned checkpoints evaluated against an SDXL-only test set to measure cross-generator transfer.
 
-The final dataset, **Synth10**, contains **60,000 synthetic images** (6,000 per class) at 32x32 resolution, structured identically to CIFAR-10 with a 50,000/10,000 train/test split.
+The final dataset, **GenSyn10**, contains **60,000 synthetic images** (6,000 per class) at 32x32 resolution, structured identically to CIFAR-10 with a 50,000/10,000 train/test split.
 
 ---
 
@@ -62,14 +97,14 @@ The final dataset, **Synth10**, contains **60,000 synthetic images** (6,000 per 
 │
 ├── cifar10_model_init.ipynb                        # Load & benchmark 17 architectures on CIFAR-10
 ├── cifar10_benchmark_eval_with_synth10_four_stage_with_results (final).ipynb
-│                                                   # Four-stage CIFAR-10 vs Synth10 cross-evaluation
+│                                                   # Four-stage CIFAR-10 vs GenSyn10 cross-evaluation
 ├── SynthCIFAR_binary_classification_with_results (final).ipynb
-│                                                   # Binary real-vs-synthetic detection benchmark (Synth10)
+│                                                   # Binary real-vs-synthetic detection benchmark (GenSyn10)
 ├── SDCIFAR_binary_classification_with_results.ipynb
 │                                                   # Binary real-vs-SDXL detection (single-model variant)
-├── sdxl_dataset_synth10_eval.ipynb                 # Synth10 fine-tuned models evaluated on SDL-only test set
+├── sdxl_dataset_synth10_eval.ipynb                 # GenSyn10 fine-tuned models evaluated on SDL-only test set
 │
-└── Synth10(Unsplitted)/                                        # Output: 32x32 images per class 
+└── GenSyn10(Unsplitted)/                                        # Output: 32x32 images per class 
     ├── airplane/
     ├── automobile/
     ├── bird/
@@ -181,7 +216,7 @@ Each generation run supports **resume**: if both the high-res and CIFAR image al
 
 **Notebook:** `synth10_fid_inception_metrics_eval.ipynb`
 
-Computes distributional quality metrics comparing the full 60,000-image Synth10 dataset against the original CIFAR-10 training set using `torch-fidelity`:
+Computes distributional quality metrics comparing the full 60,000-image GenSyn10 dataset against the original CIFAR-10 training set using `torch-fidelity`:
 
 | Metric | Value | Interpretation |
 |--------|-------|----------------|
@@ -228,11 +263,11 @@ Evaluates all 17 models under four scientifically relevant settings to measure d
 | Stage | Evaluation Set | Description |
 |-------|---------------|-------------|
 | **1. Pre-FT on CIFAR-10** | CIFAR-10 test | Baseline performance on real data |
-| **2. Pre-FT on Synth10** | Synth10 test | Zero-shot transfer to synthetic data |
-| **3. Post-Synth10-FT on CIFAR-10** | CIFAR-10 test | Retention/forgetting after synthetic fine-tuning |
-| **4. Post-Synth10-FT on Synth10** | Synth10 test | Adaptation gains from synthetic fine-tuning |
+| **2. Pre-FT on GenSyn10** | GenSyn10 test | Zero-shot transfer to synthetic data |
+| **3. Post-GenSyn10-FT on CIFAR-10** | CIFAR-10 test | Retention/forgetting after synthetic fine-tuning |
+| **4. Post-GenSyn10-FT on GenSyn10** | GenSyn10 test | Adaptation gains from synthetic fine-tuning |
 
-**Synth10 fine-tuning protocol:**
+**GenSyn10 fine-tuning protocol:**
 
 - Stratified train/validation split from `synth10/train`
 - Classifier-head warm-up followed by full-network fine-tuning
@@ -252,19 +287,19 @@ Evaluates all 17 models under four scientifically relevant settings to measure d
 
 **Notebook:** `SynthCIFAR_binary_classification_with_results (final) (1).ipynb`
 
-All 17 models are adapted for **binary classification** on the **SynthCIFAR** dataset:
+All 17 models are adapted for **binary classification** on the **GenSynCIFAR10** dataset:
 
 ```
-SynthCIFAR/
+GenSynCIFAR10/
 ├── train/
 │   ├── real/       # real CIFAR-10 images
-│   └── synthetic/  # Synth10 images
+│   └── synthetic/  # GenSyn10 images
 └── test/
     ├── real/
     └── synthetic/
 ```
 
-Models are first loaded from their CIFAR-10 checkpoints, then the final classification head is replaced with a 2-class head and fine-tuned on the SynthCIFAR train split.
+Models are first loaded from their CIFAR-10 checkpoints, then the final classification head is replaced with a 2-class head and fine-tuned on the GenSynCIFAR10 train split.
 
 **Primary positive class:** `synthetic`
 
@@ -274,15 +309,15 @@ Models are first loaded from their CIFAR-10 checkpoints, then the final classifi
 
 ### Stage 7: Single-Model (SD Large) Generalization Studies
 
-These two notebooks isolate **SD 3.5 Large** as the only generator and probe how well models trained or evaluated on the multi-model **Synth10** dataset transfer to a single-generator regime.
+These two notebooks isolate **SD 3.5 Large** as the only generator and probe how well models trained or evaluated on the multi-model **GenSyn10** dataset transfer to a single-generator regime.
 
 **Notebook:** `SDCIFAR_binary_classification_with_results.ipynb`
 
-A direct counterpart to the Stage 6 SynthCIFAR benchmark, but the synthetic half of the dataset comes **exclusively from SD** (`SdxlCIFAR/`) instead of the full multi-model Synth10 mix. All 17 architectures are loaded from CIFAR-10 checkpoints, adapted to a 2-class head, and fine-tuned to discriminate **real vs. SD-only** images. Useful for measuring how generator-specific real-vs-synthetic detection is, and how performance changes when the synthetic distribution is narrower.
+A direct counterpart to the Stage 6 GenSynCIFAR10 benchmark, but the synthetic half of the dataset comes **exclusively from SD** (`SdxlCIFAR/`) instead of the full multi-model GenSyn10 mix. All 17 architectures are loaded from CIFAR-10 checkpoints, adapted to a 2-class head, and fine-tuned to discriminate **real vs. SD-only** images. Useful for measuring how generator-specific real-vs-synthetic detection is, and how performance changes when the synthetic distribution is narrower.
 
 **Notebook:** `sdxl_dataset_synth10_eval.ipynb`
 
-Evaluates the **Synth10 fine-tuned model checkpoints** (produced in Stage 5) against a custom **SD-only test dataset** (`sdxl10/`) downloaded from Google Drive. Every `.pth` checkpoint in `model_cache` is loaded, its architecture reconstructed, and inference is run on 100% of the test set (no train/val split) using the same full classification metric suite as the main benchmark. This quantifies how well multi-model Synth10 fine-tuning generalizes to a single-generator (SDXL) test distribution and produces a ranked comparison table across all 17 architectures.
+Evaluates the **GenSyn10 fine-tuned model checkpoints** (produced in Stage 5) against a custom **SD-only test dataset** (`sdxl10/`) downloaded from Google Drive. Every `.pth` checkpoint in `model_cache` is loaded, its architecture reconstructed, and inference is run on 100% of the test set (no train/val split) using the same full classification metric suite as the main benchmark. This quantifies how well multi-model GenSyn10 fine-tuning generalizes to a single-generator (SDXL) test distribution and produces a ranked comparison table across all 17 architectures.
 
 ---
 
@@ -308,7 +343,7 @@ All evaluation and benchmark notebooks use the same set of 17 architectures span
 
 ## Key Results
 
-### Synth10 Distributional Quality (vs. CIFAR-10)
+### GenSyn10 Distributional Quality (vs. CIFAR-10)
 
 | Metric | Value |
 |--------|-------|
@@ -323,15 +358,15 @@ All evaluation and benchmark notebooks use the same set of 17 architectures span
 | Stage | Best Model | Accuracy | Balanced Acc. | F1 Macro | ROC AUC | MCC |
 |-------|-----------|----------|---------------|----------|---------|-----|
 | Pre-FT on CIFAR-10 | Swin-Base | 98.83% | 98.83% | 98.83% | 99.98% | 0.9870 |
-| Pre-FT on Synth10 (zero-shot) | Swin-Base | 96.86% | 96.86% | 96.83% | 99.84% | 0.9656 |
-| Post-Synth10-FT on CIFAR-10 | ViT-Base/16 | 95.12% | 95.12% | 95.13% | n/a | n/a |
-| Post-Synth10-FT on Synth10 | ViT-Base/16 | 99.85% | 99.85% | 99.85% | 100.00% | 0.9983 |
+| Pre-FT on GenSyn10 (zero-shot) | Swin-Base | 96.86% | 96.86% | 96.83% | 99.84% | 0.9656 |
+| Post-GenSyn10-FT on CIFAR-10 | ViT-Base/16 | 95.12% | 95.12% | 95.13% | n/a | n/a |
+| Post-GenSyn10-FT on GenSyn10 | ViT-Base/16 | 99.85% | 99.85% | 99.85% | 100.00% | 0.9983 |
 
 **Key findings:**
 
-- **Largest Synth10 F1 gain after fine-tuning:** MNASNet-1.0 (+17.80 points)
-- CIFAR-10-trained models achieve **96.86% zero-shot accuracy** on Synth10, indicating high distributional alignment
-- After fine-tuning on Synth10, models reach **99.85% accuracy** on the synthetic test set while retaining strong CIFAR-10 performance
+- **Largest GenSyn10 F1 gain after fine-tuning:** MNASNet-1.0 (+17.80 points)
+- CIFAR-10-trained models achieve **96.86% zero-shot accuracy** on GenSyn10, indicating high distributional alignment
+- After fine-tuning on GenSyn10, models reach **99.85% accuracy** on the synthetic test set while retaining strong CIFAR-10 performance
 
 ---
 
@@ -499,11 +534,11 @@ Open `synth10_fid_inception_metrics_eval.ipynb`. Ensure `SYNTH_ROOT` points to t
 
 - **CIFAR-10 baseline:** `cifar10_model_init.ipynb`
 - **Four-stage cross-domain study:** `cifar10_benchmark_eval_with_synth10_four_stage_with_results (final).ipynb`
-- **Binary real-vs-synthetic detection (Synth10):** `SynthCIFAR_binary_classification_with_results (final) (1).ipynb`
+- **Binary real-vs-synthetic detection (GenSyn10):** `SynthCIFAR_binary_classification_with_results (final) (1).ipynb`
 - **Binary real-vs-SDXL detection (single-model):** `SDCIFAR_binary_classification_with_results.ipynb`
-- **Synth10 fine-tuned models on SDXL-only test set:** `sdxl_dataset_synth10_eval.ipynb`
+- **GenSyn10 fine-tuned models on SDXL-only test set:** `sdxl_dataset_synth10_eval.ipynb`
 
-The benchmark notebooks download model checkpoints and datasets (SynthCIFAR, SdxlCIFAR, Synth10, sdxl10) from Google Drive automatically via `gdown`.
+The benchmark notebooks download model checkpoints and datasets (GenSynCIFAR10, SdxlCIFAR, GenSyn10, sdxl10) from Google Drive automatically via `gdown`.
 
 ---
 
