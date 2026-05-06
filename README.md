@@ -24,7 +24,7 @@ When reading the notebooks, treat every `synth10` / `Synth10` reference as **Gen
 
 Each `Image_Generation_*.ipynb` notebook (SDXL, FLUX.2, Qwen-Image, HunyuanImage-3) is configured to generate **1000 images per run** — this is set by `samples_per_class=1000` inside the notebook's `GenConfig`.
 
-To build the full **60,000-image GenSyn10 dataset** (6,000 images per class across the four backends and prompt batches), the image generation notebooks must be **re-run multiple times** with different prompt slices and seeds, or `samples_per_class` must be increased manually.
+To build the full **60,000-image GenSyn10 dataset** (6,000 images per class across the four backends and prompt batches), the image generation notebooks must be **re-run multiple times** with different prompt slices and seeds.
 
 ### Many experimental notebooks expect the dataset to already be in the environment
 
