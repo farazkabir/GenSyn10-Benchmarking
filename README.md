@@ -103,18 +103,7 @@ The final dataset, **GenSyn10**, contains **60,000 synthetic images** (6,000 per
 ├── SDCIFAR_binary_classification_with_results.ipynb
 │                                                   # Binary real-vs-SDXL detection (single-model variant)
 ├── sdxl_dataset_synth10_eval.ipynb                 # GenSyn10 fine-tuned models evaluated on SDL-only test set
-│
-└── GenSyn10(Unsplitted)/                                        # Output: 32x32 images per class 
-    ├── airplane/
-    ├── automobile/
-    ├── bird/
-    ├── cat/
-    ├── deer/
-    ├── dog/
-    ├── frog/
-    ├── horse/
-    ├── ship/
-    └── truck/
+
 ```
 
 ---
