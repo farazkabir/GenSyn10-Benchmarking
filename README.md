@@ -530,6 +530,12 @@ Open `synth10_fid_inception_metrics_eval.ipynb`. Ensure `SYNTH_ROOT` points to t
 The benchmark notebooks download model checkpoints and datasets (GenSynCIFAR10, SdxlCIFAR, GenSyn10, sdxl10) from Google Drive automatically via `gdown`.
 
 ---
+## Data and Weights Request
+
+The data and weights for this project are available upon request. Please reach out to me via email to get the download links. 
+
+**Contact:** `farazkabir [at] gmail [dot] com` with the subject line "Data Request: GenSyn10".
+---
 
 ## Hardware Used
 
